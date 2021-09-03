@@ -10,10 +10,6 @@ CGAL  ----- Computational geometry library.
 Thrust ---- Build-in library of cuda, similar to STL of C++
 Paraview -- (Optional) Visualization software for animation purpose. 
 
-To obtain source code copy: 
-git clone https://github.com/laosunhust/SceCells.git (original version)
-git clone https://github.com/ali1363/scecells.git    (updated  version)
-
 To compile:
  (1) In project root folder, type "cmake ." ("sudo cmake ." preferred)
  (2) type "make" 
