@@ -1,0 +1,227 @@
+/*
+ * CellInitHelper.h
+ *
+ *  Created on: Sep 22, 2013
+ *      Author: wsun2
+ */
+
+#ifndef CELLINITHELPER_H_
+#define CELLINITHELPER_H_
+
+#include <vector>
+#include "GeoVector.h"
+#include <cmath>
+#include "commonData.h"
+#include "ConfigParser.h"
+#include "Point2D.h"
+#include <assert.h>
+#include <time.h>
+#include <stdlib.h>
+#include <string>
+//#include "MeshGen.h"
+
+using namespace std;
+
+/**
+ * Parameter the controls the simualtion.
+ */
+//Ali
+struct ForReadingData_M2 {
+      public: 
+      vector <double> TempSX,TempSY,TempSZ;
+	  vector <ECellType> eCellTypeV ; //Ali 
+       int    CellNumber ; 
+}; 
+
+ForReadingData_M2  ReadFile_M2(std::string CellCentersFileName);
+ECellType StringToECellTypeConvertor (const string & eCellTypeString) ;// Ali 
+MembraneType1 StringToMembraneType1Convertor (const string & mTypeString) ;// Ali 
+//Ali 
+
+struct SimulationGlobalParameter {
+public:
+	std::string animationNameBase;
+	std::string ResumeNameBase;
+    double InitTimeStage ; 
+	double totalSimuTime;
+	double dt;
+    double Damp_Coef ; 
+	int totalTimeSteps;
+	int totalFrameCount;
+	int aniAuxVar;
+	AnimationCriteria aniCri;
+	std::string dataOutput;
+	std::string imgOutput;
+	std::string dataFolder;
+	std::string dataName;
+	void initFromConfig();
+};
+
+/**
+ * Handles cell initialization.
+ */
+class CellInitHelper {
+	SimulationType simuType;
+    vector<vector<CVector> > readResumeIntnlNodes (int numCells, int maxIntnlNodeCountPerCell, string intnlFileName); 
+	vector<vector<CVector> > readMembNodes        (int numCells, int maxMembrNodeCountPerCell,
+                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFilename); 
+	// vector<vector<CVector> > readMembNodes_multip_info        (int numCells, int maxMembrNodeCountPerCell,
+                                                        //    vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFilename, vector<double>multip_info, vector<double>multip_info_ECM, vector<double>multip_info_ECM_apical);  
+	vector<vector<CVector> > readMembNodes_multip_actomyo(int numCells,int maxMembrNodeCountPerCell,
+                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFileName, vector<double> multip_info, vector<double> multip_info2);
+	vector<vector<CVector> > readMembNodes_multip_integrin(int numCells,int maxMembrNodeCountPerCell,
+                                                           vector<vector<MembraneType1> >& mTypeV2,vector<vector<double> >& mDppV2, string membFileName, vector<double> multip_info_ECM, vector<double> multip_info_ECM_apical);
+	vector<CVector> internalBdryPts;
+
+	CVector getPointGivenAngle(double currentAngle, double r,
+			CVector centerPos);
+	void generateRandomAngles(vector<double> &randomAngles,
+			int initProfileNodeSize);
+	void generateCellInitNodeInfo_v2(vector<CVector> &initPos);
+	void generateCellInitNodeInfo_v3(vector<CVector>& initCenters,
+			vector<double>& initGrowProg, vector<vector<CVector> >& initBdryPos,
+			vector<vector<CVector> >& initInternalPos, 
+			vector<vector<CVector> >& initMembrMultip_actomyo,
+			vector<vector<CVector> >& initMembrMultip_integrin,
+			vector<vector<double> >& mDppV2, 
+			vector<vector<MembraneType1> >& mTypeV2);
+	void generateECMInitNodeInfo(vector<CVector> &initECMNodePoss,
+			int initNodeCountPerECM);
+	void generateECMCenters(vector<CVector> &ECMCenters,
+			vector<CVector> &CellCenters, vector<CVector> &bdryNodes);
+
+	bool anyECMCenterTooClose(vector<CVector> &ecmCenters, CVector position);
+	bool anyCellCenterTooClose(vector<CVector> &cellCenters, CVector position);
+	bool anyBoundaryNodeTooClose(vector<CVector> &bdryNodes, CVector position);
+
+	/**
+	 * generate a random number between min and max.
+	 */
+	double getRandomNum(double min, double max);
+
+	/**
+	 * generates an array that could qualify for initial position of nodes in a cell.
+	 */
+	vector<CVector> generateInitCellNodes();
+	vector<CVector> generateInitIntnlNodes(CVector& center, double initProg);
+	vector<CVector> generateInitIntnlNodes_M(CVector& center, double initProg, int cellRank); //Ali 
+
+	vector<CVector> generateInitMembrNodes(CVector& center, double initProg);
+
+	/**
+	 * Attempt to generate an array that represents relative position of nodes in a cell.
+	 */
+	vector<CVector> tryGenInitCellNodes();
+	vector<CVector> tryGenInitCellNodes(uint initNodeCt);
+	/**
+	 * Determine if an array, representing relative position of nodes in a cell,
+	 * is qualified for initialization purpose.
+	 */
+	bool isPosQualify(vector<CVector> &poss);
+
+	/**
+	 * Initialize internal boundary points given input file.
+	 */
+	void initInternalBdry();
+
+	/**
+	 * Initialize raw input given an array of cell center positions.
+	 */
+	void initializeRawInput(RawDataInput &rawInput,
+			std::vector<CVector> &cellCenterPoss);
+
+	/**
+	 * generate initial node positions given cartilage raw data.
+	 */
+	void transformRawCartData(CartilageRawData &cartRawData, CartPara &cartPara,
+			std::vector<CVector> &initNodePos);
+
+	/**
+	 * Given a cell center position, decide if the center position is MX type or not.
+	 */
+	bool isMXType(CVector position);
+
+	vector<CVector> rotate2D(vector<CVector> &initECMNodePoss, double angle);
+
+	/**
+	 * Used for generate RawDataInput for actual simulation purpose.
+	 * The raw data generated does not only contain cell center positions but also
+	 * epithelium node positions and boundary node positions.
+	 */
+	RawDataInput generateRawInputWithProfile(
+			std::vector<CVector> &cellCenterPoss, bool isInnerBdryIncluded =
+					true);
+
+	/**
+	 * generate simulation initialization data _v2 given raw data.
+	 */
+	SimulationInitData_V2 initInputsV3(RawDataInput &rawData);
+
+	/**
+	 * generate simulation initialization data _v2_m given raw data.
+	 */
+	SimulationInitData_V2_M initInputsV3_M(RawDataInput_M &rawData_m);
+
+	/**
+	 * Used for generate RawDataInput for stabilization purpose.
+	 * In order to place cells in a random domain, we need an initialization step to stabilize
+	 * cell center positions which are generated by triangular mesh. It is usually difficult for
+	 * triangular meshing to generate semi-evenly displaced cell centers.
+	 */
+	RawDataInput generateRawInput_stab();
+
+	/**
+	 * Used for generate RawDataInput for stabilization purpose.
+	 * In order to place cells in a random domain, we need an initialization step to stabilize
+	 * cell center positions which are generated by triangular mesh. It is usually difficult for
+	 * triangular meshing to generate semi-evenly displaced cell centers.
+	 */
+	RawDataInput_M generateRawInput_M();
+
+	/**
+	 * Used for generate RawDataInput for single cell model test purpose.
+	 */
+	RawDataInput generateRawInput_singleCell();
+
+	/**
+	 * Used for generate RawDataInput for actual simulation purpose.
+	 */
+	RawDataInput generateRawInput_simu(std::vector<CVector> &cellCenterPoss);
+
+	/**
+	 * generate simulation initialization data given raw data.
+	 */
+	SimulationInitData initInputsV2(RawDataInput &rawData);
+
+public:
+	/**
+	 * Default constructor is used.
+	 */
+	CellInitHelper();
+	/**
+	 * Default de-constructor is used.
+	 */
+	virtual ~CellInitHelper();
+
+	/**
+	 * generate simulation initialization data _v2.
+	 */
+	SimulationInitData_V2 initStabInput();
+
+	/**
+	 * generate simulation initialization data _v2 (modified).
+	 */
+	SimulationInitData_V2_M initInput_M();
+
+	/**
+	 * generate simulation initialization data _v2 given raw data.
+	 */
+	SimulationInitData_V2 initSimuInput(std::vector<CVector> &cellCenterPoss);
+
+	/**
+	 * generate simulation initialization data _v2 for single cell testing.
+	 */
+	SimulationInitData_V2 initSingleCellTest();
+};
+
+#endif /* CELLINITHELPER_H_ */

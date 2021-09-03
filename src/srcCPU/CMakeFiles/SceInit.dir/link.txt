@@ -1,0 +1,2 @@
+/usr/bin/ar qc libSceInit.a CMakeFiles/SceInit.dir/CellInitHelper.cpp.o CMakeFiles/SceInit.dir/__/common/Point2D.cpp.o CMakeFiles/SceInit.dir/__/common/ConfigParser.cpp.o CMakeFiles/SceInit.dir/__/common/GeoVector.cpp.o
+/usr/bin/ranlib libSceInit.a
