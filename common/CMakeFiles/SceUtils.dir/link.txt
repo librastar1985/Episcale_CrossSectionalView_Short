@@ -1,2 +1,0 @@
-/usr/bin/ar qc libSceUtils.a CMakeFiles/SceUtils.dir/GeoVector.cpp.o CMakeFiles/SceUtils.dir/Point2D.cpp.o CMakeFiles/SceUtils.dir/ConfigParser.cpp.o CMakeFiles/SceUtils.dir/commonData.cpp.o CMakeFiles/SceUtils.dir/ResAnalysisHelper.cpp.o CMakeFiles/SceUtils.dir/NetworkInfo.cpp.o
-/usr/bin/ranlib libSceUtils.a
