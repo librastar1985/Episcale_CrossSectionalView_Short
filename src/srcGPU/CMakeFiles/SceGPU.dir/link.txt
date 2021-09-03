@@ -1,0 +1,2 @@
+/usr/bin/ar qc libSceGPU.a CMakeFiles/SceGPU.dir/SceGPU_generated_Solver.cu.o CMakeFiles/SceGPU.dir/SceGPU_generated_SceNodes.cu.o CMakeFiles/SceGPU.dir/SceGPU_generated_SceECM.cu.o CMakeFiles/SceGPU.dir/SceGPU_generated_SceCells.cu.o CMakeFiles/SceGPU.dir/SceGPU_generated_SimulationDomainGPU.cu.o
+/usr/bin/ranlib libSceGPU.a
