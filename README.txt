@@ -44,7 +44,7 @@ Location of configuration files:
  ./resources
 *******************************************
 To run simulation on CRC clusters "acms.crc.nd.edu" which are based on SGE (Sun Grid Engine) cluster software :
-   (1) git clone https://github.com/ali1363/scecells.git
+   (1) Obtain all files in this repository and place these in a desired directory on the cluster.
    (2) module load cmake 
    (3) module load gcc/4.9.2
    (4) module load cuda/7.0
@@ -55,4 +55,16 @@ To run simulation on CRC clusters "acms.crc.nd.edu" which are based on SGE (Sun 
    (9) In the directory ~/SceCells write the command "make"
    (10)Submit your simulation with the command "qsub EpiScale.sh"  # Note: Other .sh files in ~/script are not active anymore#
    (11)In this setup, the .vtk animation files are in the directory ~/SceCells/animation. You may change it to ~/SceCells/animation/machine* in the disc_M.cfg file.
+   
+********************************************
+To run simulation on HPCC clusters @ UCR:
+   (1) Obtain all files in this repository and place these in a desired directory on the cluster.
+   (2) srun -p gpu --gres=gpu:1 --mem=20g --time=12:00:00 --pty bash -l (note: this calls the interactive session to compile the code, YOU WON'T HAVE ENOUGH RESOURCE TO COMPILE WITHOUT CALLING RESOURCES FROM A GPU BY THIS LINE)
+   (3) cd [NAME OF THE DIRECTORY THE FILES ARE PLACED IN] (note: don't include "[" and "]" when typing the name.)
+   (4) module load extra
+   (5) module load GCC
+   (6) module load cuda
+   (7) make -j 4 (note: or just "make" would be enough)
+   (8) sbatch -p gpu --gres=gpu:1 --time=432:00:00 Episcale_run.sh
+   
 
