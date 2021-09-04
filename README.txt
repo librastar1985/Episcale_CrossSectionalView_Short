@@ -61,6 +61,6 @@ To run simulation on HPCC clusters @ UCR:
    (5) module load GCC
    (6) module load cuda
    (7) make -j 4 (note: or just "make" would be enough)
-   (8) sbatch -p gpu --gres=gpu:1 --time=432:00:00 Episcale_run.sh
+   (8) sbatch -p gpu --gres=gpu:1 --time=432:00:00 EpiScale_run.sh
    
 
